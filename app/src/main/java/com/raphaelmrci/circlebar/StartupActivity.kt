@@ -12,9 +12,13 @@ class StartupActivity : AppCompatActivity() {
         setContentView(R.layout.activity_startup)
 
         val circle : ImageView = findViewById(R.id.circleLogo)
+        val drop : ImageView = findViewById(R.id.dropLogo)
 
-        val animation : Animation = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.rotate)
+        val fadeIn : Animation = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.fadein)
+        val rotate : Animation = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.rotate)
+        val bounce : Animation = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.bounce)
 
-        circle.startAnimation(animation)
+        drop.startAnimation(fadeIn)
+        circle.startAnimation(rotate)
     }
 }
