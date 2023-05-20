@@ -5,34 +5,82 @@ import android.content.Intent
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
+import android.os.Handler
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.raphaelmrci.circlebar.network.ApiClient
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
 
 class StartupActivity : AppCompatActivity() {
+    private var isFound = false
+
+    private lateinit var dropAnim: Animation
+    private lateinit var circleAnim: Animation
+    private lateinit  var rotateAnim: Animation
+    private lateinit var circleAnimEnd: Animation
+    private lateinit var bounceAnim: Animation
+
+    private lateinit var circle: ImageView
+    private lateinit var drop: ImageView
+
+    private lateinit var nsdManager :NsdManager
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_startup)
 
-        val circle: ImageView = findViewById(R.id.circleLogo)
-        val drop: ImageView = findViewById(R.id.dropLogo)
+        circle = findViewById(R.id.circleLogo)
+        drop = findViewById(R.id.dropLogo)
 
-        val fadeIn: Animation = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.fadein)
-        val rotate: Animation = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.rotate)
+        dropAnim = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.startup_drop)
+        circleAnim = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.startup_circle)
+        rotateAnim = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.rotate)
+        circleAnimEnd = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.startup_circle_end)
+        bounceAnim = AnimationUtils.loadAnimation(this@StartupActivity, R.anim.bounce)
 
-        drop.startAnimation(fadeIn)
-        circle.startAnimation(rotate)
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            if (isFound) {
+                circle.startAnimation(circleAnimEnd)
+                val intent = Intent(this@StartupActivity, HomeActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(R.anim.fadein, R.anim.fadeout)
+            } else {
+                launchAnimations()
+            }
+        }, circleAnim.duration, TimeUnit.MILLISECONDS)
+        drop.startAnimation(dropAnim)
+        circle.startAnimation(circleAnim)
 
         nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
 
-        val serviceType = "_http._tcp." // Adjust the service type according to your Express.js configuration
-        nsdManager?.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
+        val serviceType = "_http._tcp."
+        nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
 
     }
 
-    var nsdManager :NsdManager? = null
+    private fun launchAnimations() {
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            if (isFound) {
+                Executors.newSingleThreadScheduledExecutor().schedule({
+                    val intent = Intent(this@StartupActivity, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }, circleAnimEnd.duration, TimeUnit.MILLISECONDS)
+                circle.startAnimation(circleAnimEnd)
+            } else {
+                launchAnimations()
+            }
+        }, rotateAnim.duration, TimeUnit.MILLISECONDS)
+        circle.startAnimation(rotateAnim)
+        drop.startAnimation(bounceAnim)
+    }
+
 
 
     private val discoveryListener = object : NsdManager.DiscoveryListener {
@@ -56,7 +104,7 @@ class StartupActivity : AppCompatActivity() {
             // Service found
             if (serviceInfo.serviceType == "_http._tcp.") { // Adjust the service type according to your Express.js configuration
                 // Resolve the service to obtain the server address
-                nsdManager?.resolveService(serviceInfo, object : NsdManager.ResolveListener {
+                nsdManager.resolveService(serviceInfo, object : NsdManager.ResolveListener {
                     override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
                         // Handle service resolve failure
                     }
@@ -68,13 +116,8 @@ class StartupActivity : AppCompatActivity() {
 
                         if (serviceName == "circlebar") {
                             ApiClient.BASE_URL = "http://$serviceAddress:$serverPort/"
-                            val intent = Intent(this@StartupActivity, HomeActivity::class.java)
-                            startActivity(intent)
-                            finish()
+                            isFound = true
                         }
-
-                        // Use the serverAddress and serverPort to connect to your Express.js server
-                        // You can store this information or directly make the API calls from here
                     }
                 })
             }
@@ -87,7 +130,7 @@ class StartupActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        nsdManager?.stopServiceDiscovery(discoveryListener)
+        nsdManager.stopServiceDiscovery(discoveryListener)
 
     }
 
