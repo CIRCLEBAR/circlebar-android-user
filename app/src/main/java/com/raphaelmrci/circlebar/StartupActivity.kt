@@ -5,10 +5,12 @@ import android.content.Intent
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
-import android.os.Handler
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
+import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
+import android.view.animation.RotateAnimation
+import android.view.animation.ScaleAnimation
+import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.raphaelmrci.circlebar.network.ApiClient
@@ -46,10 +48,7 @@ class StartupActivity : AppCompatActivity() {
 
         Executors.newSingleThreadScheduledExecutor().schedule({
             if (isFound) {
-                circle.startAnimation(circleAnimEnd)
-                val intent = Intent(this@StartupActivity, HomeActivity::class.java)
-                startActivity(intent)
-                overridePendingTransition(R.anim.fadein, R.anim.fadeout)
+                changeActivity()
             } else {
                 launchAnimations()
             }
@@ -64,15 +63,83 @@ class StartupActivity : AppCompatActivity() {
 
     }
 
-    private fun launchAnimations() {
-        Executors.newSingleThreadScheduledExecutor().schedule({
-            if (isFound) {
+    private fun changeActivity() {
+        drop.clearAnimation()
+        circle.clearAnimation()
+        val circleAnimation = AnimationSet(false)
+        val dropAnimation = AnimationSet(false)
+        val rotate1 = RotateAnimation(
+            0f,
+            360f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f
+        )
+        rotate1.duration = 450
+        rotate1.repeatCount = 0
+        rotate1.repeatMode = Animation.RESTART
+        rotate1.setInterpolator(this@StartupActivity, android.R.anim.linear_interpolator)
+        circleAnimation.addAnimation(rotate1)
+
+        val finalRot = RotateAnimation(
+            0f,
+            360f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f
+        )
+        finalRot.startOffset = 450
+        finalRot.duration = 550
+        finalRot.setInterpolator(this@StartupActivity, android.R.anim.decelerate_interpolator)
+        circleAnimation.addAnimation(finalRot)
+
+        val trans1 = TranslateAnimation(
+            Animation.RELATIVE_TO_PARENT,
+            0.0f,
+            Animation.RELATIVE_TO_PARENT,
+            0f,
+            Animation.RELATIVE_TO_PARENT,
+            0.0f,
+            Animation.RELATIVE_TO_PARENT,
+            -0.84f
+        )
+        trans1.duration = 900
+        trans1.setInterpolator(this@StartupActivity, android.R.anim.accelerate_decelerate_interpolator)
+        circleAnimation.addAnimation(trans1)
+        dropAnimation.addAnimation(trans1)
+
+        val scale = ScaleAnimation(
+            1f,
+            0.45f,
+            1f,
+            0.45f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f,
+            Animation.RELATIVE_TO_SELF,
+            0.5f
+        )
+        scale.setInterpolator(this@StartupActivity, android.R.anim.accelerate_decelerate_interpolator)
+        scale.duration = 900
+        circleAnimation.addAnimation(scale)
+        dropAnimation.addAnimation(scale)
                 Executors.newSingleThreadScheduledExecutor().schedule({
                     val intent = Intent(this@StartupActivity, HomeActivity::class.java)
                     startActivity(intent)
-                    finish()
+                    overridePendingTransition(0, 0)
                 }, circleAnimEnd.duration, TimeUnit.MILLISECONDS)
-                circle.startAnimation(circleAnimEnd)
+
+        circleAnimation.fillAfter = true
+        dropAnimation.fillAfter = true
+        circle.startAnimation(circleAnimation)
+        drop.startAnimation(dropAnimation)
+    }
+
+    private fun launchAnimations() {
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            if (isFound) {
+                changeActivity()
             } else {
                 launchAnimations()
             }
