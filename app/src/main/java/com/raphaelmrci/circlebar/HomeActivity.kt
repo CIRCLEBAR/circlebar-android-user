@@ -30,13 +30,15 @@ class HomeActivity : AppCompatActivity(), CoroutineScope {
 
     private var collections = mutableMapOf<String, MutableList<Cocktail>>()
 
-    private val recyclerAdapter = CollectionsAdapter(collections)
+    private lateinit var recyclerAdapter : CollectionsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         fadeinAnim = AnimationUtils.loadAnimation(this@HomeActivity, R.anim.fadein)
+
+        recyclerAdapter = CollectionsAdapter(collections, this@HomeActivity)
 
         refreshLayout = findViewById(R.id.refreshHomeLayout)
         noCocktailsText = findViewById(R.id.noCocktailsText)
