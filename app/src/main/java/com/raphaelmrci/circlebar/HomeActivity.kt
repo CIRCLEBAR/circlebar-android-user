@@ -1,5 +1,6 @@
 package com.raphaelmrci.circlebar
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +9,10 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.raphaelmrci.circlebar.models.Cocktail
 import com.raphaelmrci.circlebar.network.ApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +25,13 @@ class HomeActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var fadeinAnim : Animation
     private lateinit var noCocktailsText : TextView
     private lateinit var refreshLayout : SwipeRefreshLayout
+    private lateinit var recyclerView: RecyclerView
+
+
+    private var collections = mutableMapOf<String, MutableList<Cocktail>>()
+
+    private val recyclerAdapter = CollectionsAdapter(collections)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -29,15 +40,21 @@ class HomeActivity : AppCompatActivity(), CoroutineScope {
 
         refreshLayout = findViewById(R.id.refreshHomeLayout)
         noCocktailsText = findViewById(R.id.noCocktailsText)
+        recyclerView = findViewById(R.id.collectionsList)
 
         refreshLayout.setOnRefreshListener {
             noCocktailsText.visibility = View.GONE
+            collections.clear()
             executeCall()
         }
+
+        recyclerView.adapter = recyclerAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         executeCall()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun executeCall() {
         launch(Dispatchers.Main) {
             try {
@@ -52,11 +69,18 @@ class HomeActivity : AppCompatActivity(), CoroutineScope {
 
                     if (content != null) {
                         var count = 0
-                        for ((i, cocktail) in content.withIndex()) {
-                            cocktail.name
-                            cocktail.id
+                        content.forEach { cocktail ->
+
+                            cocktail.collections.forEach { collName ->
+                                if (collections[collName] == null) {
+                                    collections[collName] = mutableListOf()
+                                }
+                                collections[collName]?.add(cocktail)
+                            }
                             count++
                         }
+                        Log.d("HOME", collections.keys.toString())
+                        recyclerView.adapter!!.notifyDataSetChanged()
                         if (count == 0) {
                             noCocktailsText.startAnimation(fadeinAnim)
                             noCocktailsText.visibility = View.VISIBLE
