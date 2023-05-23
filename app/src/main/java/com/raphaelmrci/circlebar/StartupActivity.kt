@@ -103,7 +103,7 @@ class StartupActivity : AppCompatActivity() {
             Animation.RELATIVE_TO_PARENT,
             0.0f,
             Animation.RELATIVE_TO_PARENT,
-            -0.84f
+            -0.876f
         )
         trans1.duration = 900
         trans1.setInterpolator(this@StartupActivity, android.R.anim.accelerate_decelerate_interpolator)

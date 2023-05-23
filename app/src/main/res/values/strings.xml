@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CIRCLEBAR</string>
+    <string name="no_available_cocktail">No cocktail available for now...</string>
 </resources>
