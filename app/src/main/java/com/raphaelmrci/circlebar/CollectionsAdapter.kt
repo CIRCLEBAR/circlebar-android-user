@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raphaelmrci.circlebar.models.Cocktail
-import kotlin.coroutines.coroutineContext
 
 class CollectionsAdapter(private val mCollections : MutableMap<String, MutableList<Cocktail>>, private val mContext: Context) : RecyclerView.Adapter<CollectionsAdapter.ViewHolder>() {
 
@@ -36,12 +35,11 @@ class CollectionsAdapter(private val mCollections : MutableMap<String, MutableLi
     override fun onBindViewHolder(holder: CollectionsAdapter.ViewHolder, position: Int) {
         val collectionName = mCollections.keys.elementAt(position)
         val collectionTitle = holder.collectionTitle
-        val adapter = mCollections[collectionName]?.let { CocktailAdapter(it) }
+        val adapter = mCollections[collectionName]?.let { CocktailAdapter(it, mContext) }
 
         holder.cocktailsRecycler.adapter = adapter
-        holder.cocktailsRecycler.layoutManager = LinearLayoutManager(mContext)
+        holder.cocktailsRecycler.layoutManager = LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false)
 
         collectionTitle.text = collectionName
-
     }
 }

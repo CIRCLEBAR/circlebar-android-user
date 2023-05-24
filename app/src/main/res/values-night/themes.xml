@@ -9,4 +9,16 @@
 
 
     </style>
+
+    <style name="Theme.CIRCLEBAR" parent="Base.Theme.CIRCLEBAR" />
+
+    <style name="Theme.CIRCLEBAR.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.CIRCLEBAR.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.CIRCLEBAR.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
