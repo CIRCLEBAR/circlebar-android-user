@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
@@ -14,6 +15,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.raphaelmrci.circlebar.network.ApiClient
+import com.raphaelmrci.circlebar.network.SocketHandler
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -184,6 +186,9 @@ class StartupActivity : AppCompatActivity() {
                         if (serviceName == "circlebar") {
                             ApiClient.BASE_URL = "http://$serviceAddress:$serverPort/"
                             isFound = true
+                            SocketHandler.setSocket(serviceAddress)
+                            val mSocket = SocketHandler.getSocket()
+                            mSocket.connect()
                         }
                     }
                 })

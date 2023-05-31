@@ -94,4 +94,14 @@
     <string name="action_settings">Settings</string>
     <string name="back">Return</string>
     <string name="command">Commander</string>
+    <string name="preparation_warning">Do you really want to launch the preparation of this cocktail ?</string>
+    <string name="cancel">Annuler</string>
+    <string name="wait_your_turn">Attendez votre tour...</string>
+    <string name="your_turn">C\'est à vous !</string>
+    <string name="lets_go">C\'est parti !</string>
+    <string name="place_glass">Veuillez positionner votre verre dans la machine.</string>
+    <string name="please_confirm">Confirmez ensuite le lancement de la préparation de votre boisson.</string>
+    <string name="wip">Préparation en cours...</string>
+    <string name="finished">Préparation terminée !</string>
+    <string name="ge_your_glass">Veuillez récupérer votre verre.</string>
 </resources>

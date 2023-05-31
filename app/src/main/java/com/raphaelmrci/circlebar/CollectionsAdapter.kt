@@ -11,11 +11,7 @@ import com.raphaelmrci.circlebar.models.Cocktail
 
 class CollectionsAdapter(private val mCollections : MutableMap<String, MutableList<Cocktail>>, private val mContext: Context) : RecyclerView.Adapter<CollectionsAdapter.ViewHolder>() {
 
-    // Provide a direct reference to each of the views within a data item
-    // Used to cache the views within the item layout for fast access
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // Your holder should contain and initialize a member variable
-        // for any view that will be set as you render a row
         val collectionTitle: TextView = itemView.findViewById(R.id.collectionTitle)
         val cocktailsRecycler: RecyclerView = itemView.findViewById(R.id.cocktailsList)
     }

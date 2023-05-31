@@ -81,7 +81,6 @@ class HomeActivity : AppCompatActivity(), CoroutineScope {
                             }
                             count++
                         }
-                        Log.d("HOME", collections.keys.toString())
                         recyclerView.adapter!!.notifyDataSetChanged()
                         if (count == 0) {
                             noCocktailsText.startAnimation(fadeinAnim)

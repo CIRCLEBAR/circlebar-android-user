@@ -2,6 +2,7 @@ package com.raphaelmrci.circlebar
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,7 @@ class CocktailAdapter(private val mCocktails : MutableList<Cocktail>, private va
         holder.card.setOnClickListener {
             val intent = Intent(mContext, CocktailActivity::class.java)
 
+            Log.d("DEBUG", mCocktails[position].id.toString())
             intent.apply {
                 putExtra("imageURL", cocktailImage)
                 putExtra("cocktailName", cocktailName)
