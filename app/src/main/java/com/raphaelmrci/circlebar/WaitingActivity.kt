@@ -7,8 +7,11 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import com.raphaelmrci.circlebar.network.SocketHandler
+import io.socket.client.Socket
 
 class WaitingActivity : AppCompatActivity() {
+
+    private lateinit var mSocket: Socket
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_waiting)
@@ -17,13 +20,14 @@ class WaitingActivity : AppCompatActivity() {
 
         val cocktailID = intent.getIntExtra("cocktailID", -1)
 
-        val mSocket = SocketHandler.getSocket()
+        mSocket = SocketHandler.getSocket()
 
         if (!mSocket.connected())
             mSocket.connect()
 
         cancelBtn.setOnClickListener {
             mSocket.emit("cancel")
+            SocketHandler.removeAllSocketEvents()
             finish()
         }
 
@@ -32,6 +36,7 @@ class WaitingActivity : AppCompatActivity() {
                 Toast
                     .makeText(this@WaitingActivity, "Unauthorized command...", Toast.LENGTH_LONG)
                     .show()
+                SocketHandler.removeAllSocketEvents()
                 finish()
             }
         }
@@ -41,6 +46,7 @@ class WaitingActivity : AppCompatActivity() {
                 Toast
                     .makeText(this@WaitingActivity, "This cocktail is unavailable.", Toast.LENGTH_LONG)
                     .show()
+                SocketHandler.removeAllSocketEvents()
                 finish()
             }
         }
@@ -53,6 +59,7 @@ class WaitingActivity : AppCompatActivity() {
             runOnUiThread {
                 val intent = Intent(this, PutGlassActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                SocketHandler.removeAllSocketEvents()
                 startActivity(intent)
                 finish()
             }
@@ -62,10 +69,17 @@ class WaitingActivity : AppCompatActivity() {
             Toast
                 .makeText(this@WaitingActivity, "Error while loading the cocktail...", Toast.LENGTH_LONG)
                 .show()
+            SocketHandler.removeAllSocketEvents()
             finish()
         } else {
             mSocket.emit("command", cocktailID)
         }
+    }
+
+    override fun onBackPressed() {
+        mSocket.emit("cancel")
+        SocketHandler.removeAllSocketEvents()
+        finish()
     }
 
     companion object {

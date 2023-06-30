@@ -9,6 +9,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="294dp"
         android:layout_height="235dp"
+        android:layout_marginBottom="7dp"
         android:layout_marginHorizontal="9dp"
         app:cardCornerRadius="10dp"
         android:id="@+id/cocktailCard">

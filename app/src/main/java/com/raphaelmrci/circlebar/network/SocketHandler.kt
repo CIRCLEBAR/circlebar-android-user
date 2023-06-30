@@ -31,4 +31,17 @@ object SocketHandler {
     fun getSocket(): Socket {
         return mSocket
     }
+
+    @Synchronized
+    fun removeAllSocketEvents() {
+        mSocket.off()
+        mSocket.on("addr") {
+            mSocket.emit("addr", uid)
+        }
+
+        mSocket.on("setAddr") { args ->
+            uid = args[0] as String
+            Log.d("SOCKETCONF", uid!!)
+        }
+    }
 }
